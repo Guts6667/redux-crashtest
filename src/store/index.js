@@ -1,58 +1,41 @@
-import { createStore } from "redux";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
 
 // The reducer is a standard function that will always receive two parameters:
 // The old state + Dispatched Action
 // It must then return a new state that will mostly be an object
 
-const intialState = { counter: 0, showCounter: true };
-const counterReducer = (state = intialState, action) => {
-  if (action.type === "increment") {
-    return {
-      counter: state.counter + 1,
-      showCounter: state.showCounter,
-      name: state.name,
-    };
-  }
-  if (action.type === "increase") {
-    return {
-      counter: state.counter + action.amount,
-      showCounter: state.showCounter,
-      name: state.name,
-    };
-  }
-  if (action.type === "decrement") {
-    return {
-      counter: state.counter - 1,
-      showCounter: state.showCounter,
-      name: state.name,
-    };
-  }
-  if (action.type === "toggle") {
-    return {
-      // The reducer always rewrite the values
-      // If I don't setup a value for all of my entries
-      // Then the one forgot will therefore be undefined
-      // ALWAYS SET THE OTHER STATES WHEN WE WANT TO OVERWRITE A SPECIFIC STATE
-      showCounter: !state.showCounter,
-      counter: state.counter,
-      name: state.name,
-    };
-  }
+const initialState = { counter: 0, showCounter: true };
 
-  return state;
-};
+// createSlice allow to prepare a slice of a global state
+// Then we can create different slices
+const counterSlice = createSlice({
+  name: "counter",
+  initialState,
+  reducers: {
+    increment(state) {
+      // With redux/toolkit the state is automatically cloned.
+      //Therefore, it's impossible to mutate the state by acciedent
+      state.counter++;
+    },
+    decrement(state) {
+      state.counter--;
+    },
+    increase(state, action) {
+      // The default redux/toolkit syntax requires to add payload to refere to the data passed
+      state.counter = state.counter + action.payload;
+    },
+    toggleCounter(state) {
+      state.showCounter = !state.showCounter;
+    },
+  },
+});
+// configureStore creates a store but also make merging multiple reducers into one easire
+// It takes an object as a paramater
+const store = configureStore({
+  // counterSlice becomes our global reducer for counterSlice
+  reducer: counterSlice.reducer,
+});
 
-// Here we put the function that is supposed to change the store as a parameter.
-const store = createStore(counterReducer);
+export const counterActions = counterSlice.actions;
 
 export default store;
-const counterSubscriber = () => {
-  // getState() = native function => allows to get the state.
-  const latestState = store.getState();
-  console.log(latestState);
-};
-
-// subscribe is a native function that calls another function whenver the state changes.
-store.subscribe(counterSubscriber);
-
-// dispatch allows to send a command to the reducer.
