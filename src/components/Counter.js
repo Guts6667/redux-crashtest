@@ -6,8 +6,8 @@ const Counter = () => {
   // With useDispatch, we can automatically dispatch actions to our store.
   const dispatch = useDispatch();
   // useSelector allows to retrieve only the part of the store state I want.
-  const counter = useSelector((state) => state.counter);
-  const show = useSelector((state) => state.showCounter);
+  const counter = useSelector((state) => state.counter.counter);
+  const show = useSelector((state) => state.counter.showCounter);
   const incrementHandler = () => {
     dispatch(counterActions.increment());
   };
